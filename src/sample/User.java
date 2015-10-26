@@ -1,18 +1,22 @@
 package sample;
 
+import java.util.DoubleSummaryStatistics;
+
 /**
  * Created by Nastia on 26.10.2015.
  */
 public class User {
 
     private String currency;
-    private String value;
+    private Double purchase;
+    private Double sale;
 
 
-    public User(String currency, String value) {
+    public User(String currency, Double purchase, Double sale) {
 
         this.currency = currency;
-        this.value = value;
+        this.purchase = purchase;
+        this.sale = sale;
     }
 
 
@@ -24,11 +28,19 @@ public class User {
         this.currency = currency;
     }
 
-    public String getValue() {
-        return value;
+    public Double getPurchase() {
+        return purchase;
     }
 
-    public void setValue() {
-        this.value = value;
+    public void setPurchase() {
+        this.purchase = purchase;
+    }
+
+    public Double getSale()
+    {
+        return sale;
+    }
+    public void setSale(){
+        this.sale = sale;
     }
 }
