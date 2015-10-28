@@ -1,0 +1,5 @@
+<root>
+  <item name='javafx.scene.control.cell.PropertyValueFactory'>
+    <annotation name='java.lang.annotation.Deprecated'/>
+  </item>
+</root>

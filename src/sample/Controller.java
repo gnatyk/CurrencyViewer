@@ -17,38 +17,60 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import com.thoughtworks.xstream.*;
-public class Controller
-{
-    @FXML
-    public DatePicker dt_1;
-    @FXML
-    private TableView<User> tableUsers;
-    @FXML
-    private TableColumn<User, String > currencyColum;
-    @FXML
-    private TableColumn<User,Double > purchaseColumn;
-    @FXML
-    private TableColumn<User,Double>saleColumn;
+import java.util.ArrayList;
+import java.util.Date;
 
-    private ObservableList<User> userData = FXCollections.observableArrayList();
+import com.thoughtworks.xstream.*;
+
+
+public class Controller {
+    //TableView<Currency> tableView = new TableView<Currency>();
+    private  ObservableList<Currency> userData = FXCollections.observableArrayList();
     @FXML
-    private void initialize()
-    {
-        initData();
-        dt_1.setValue(LocalDate.now());
+    private DatePicker dt_1;
+    @FXML
+    private TableView<Currency> tableUsers;
+    @FXML
+    private TableColumn<Currency, Integer> numCodeColumn;
+    @FXML
+    private TableColumn<Currency, String> charCodeColumn;
+    @FXML
+    private TableColumn<Currency, Integer> scaleColumn;
+    @FXML
+    private TableColumn<Currency, String> nameColumn;
+    @FXML
+    private TableColumn<Currency, Double> rateColumn;
+
+
+    @FXML
+    private void initialize() {
+
+       dt_1.setValue(LocalDate.now());
     }
+
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat(
             "MM/dd/yyyy");
+
     @FXML
-    private void ShowCurrencyRate()
-    {
-       // currencyColum.setCellValueFactory(new PropertyValueFactory<User,String>("Currency"));
-       // purchaseColumn.setCellValueFactory(new PropertyValueFactory<User, Double>("Purchase"));
-        //saleColumn.setCellValueFactory(new PropertyValueFactory<User, Double>("Sale"));
-       // tableUsers.setItems(userData);
-        String xmlResult = excuteGet("http://www.nbrb.by/Services/XmlExRates.aspx","ondate=01/31/2011");
-        xmlResult = xmlResult.trim().replaceFirst("^([\\W]+)<","<");
+    private void ShowCurrencyRate()  {
+
+        DailyExRates dailyExRates = Disirealasy();
+        initData(dailyExRates);
+        numCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("numCode"));
+        charCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, String>("charCode"));
+        scaleColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("scale"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<Currency, String>("name"));
+        rateColumn.setCellValueFactory(new PropertyValueFactory<Currency, Double>("rate"));
+        tableUsers.setItems(userData);
+
+
+
+    }
+
+      public DailyExRates Disirealasy() {
+        String xmlResult = excuteGet("http://www.nbrb.by/Services/XmlExRates.aspx", "ondate=01/31/2011");
+        xmlResult = xmlResult.trim().replaceFirst("^([\\W]+)<", "<");
+
         XStream xstream = new XStream(new StaxDriver());
 
         String dateFormat = "MM/dd/yyyy";
@@ -60,19 +82,17 @@ public class Controller
         xstream.addImplicitCollection(DailyExRates.class, "Currencies", "Currency", Currency.class);
         xstream.processAnnotations(DailyExRates.class);
         xstream.processAnnotations(Currency.class);
-        DailyExRates dailyExRates = (DailyExRates)xstream.fromXML(xmlResult);
+        DailyExRates dailyExRates = (DailyExRates) xstream.fromXML(xmlResult);
+        return dailyExRates;
     }
 
-    @FXML
-    private void exitMethod()
-    {
-      System.exit(0);
-    }
 
-    private void initData(){
-        userData.add(new User("USD ",45.5,545.5));
-        userData.add(new User( "EUR", 32.5, 45.5));
-    }
+     private void initData(DailyExRates dailyExRates) {
+
+    for(Currency c: dailyExRates.Currencies) userData.add(c);
+
+}
+
     public static String excuteGet(String targetURL, String urlParameters) {
         HttpURLConnection connection = null;
         try {
@@ -116,6 +136,4 @@ public class Controller
             }
         }
     }
-
-
    }

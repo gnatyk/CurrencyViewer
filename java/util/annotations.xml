@@ -1,0 +1,6 @@
+<root>
+  <item name='java.util.Currency'>
+    <annotation name='java.lang.annotation.Deprecated'/>
+    <annotation name='org.jetbrains.annotations.NotNull'/>
+  </item>
+</root>

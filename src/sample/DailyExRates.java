@@ -3,6 +3,7 @@ package sample;
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -13,6 +14,11 @@ import java.util.Date;
 public class DailyExRates{
     @XStreamAlias("Date")
     @XStreamAsAttribute
-    Date date;
-    ArrayList<Currency> Currencies;
+     public LocalDate date;
+     public ArrayList<Currency> Currencies;
+
+
+
+
+
 }
