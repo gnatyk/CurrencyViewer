@@ -14,7 +14,7 @@ import java.util.Date;
 public class DailyExRates{
     @XStreamAlias("Date")
     @XStreamAsAttribute
-     public LocalDate date;
+     public String date;
      public ArrayList<Currency> Currencies;
 
 
