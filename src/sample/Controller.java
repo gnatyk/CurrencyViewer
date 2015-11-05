@@ -8,6 +8,7 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
+
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -17,19 +18,24 @@ import java.net.URL;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
+
 import com.thoughtworks.xstream.*;
 
-public class Controller{
+public class Controller {
+    @FXML
+    private Button putOntheList;
 
-   @FXML
-    private  ObservableList<Currency> userData = FXCollections.observableArrayList();
+    @FXML
+    private ObservableList<Currency> userData = FXCollections.observableArrayList();
     @FXML
     private ObservableList<String> userListViewDate = FXCollections.observableArrayList();
     @FXML
     private DatePicker dt_1;
     @FXML
-    private ListView <String> listView;
+    private ListView<String> listView;
     @FXML
     private TableView<Currency> tableUsers;
     @FXML
@@ -47,60 +53,88 @@ public class Controller{
     @FXML
     private void initialize() {
 
-       dt_1.setValue(LocalDate.now());
+        dt_1.setValue(LocalDate.now());
     }
 
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat(
             "MM/dd/yyyy");
+    ArrayList<DailyExRates> listOfValueForCurrencyDate = new ArrayList<>();
 
     @FXML
-    private void ShowCurrencyRate()  {
+    private void ShowCurrencyRate() {
         refreshTable();
 
         DailyExRates dailyExRates = new DailyExRates();
-        String date = ChangeFormatDate(dt_1.getValue().toString(),dailyExRates);
+        String date = ChangeFormatDate(dt_1.getValue().toString());
         dailyExRates = Disirealasy(date);
-         userListViewDate.add(date);
-        listView.setItems(userListViewDate);
         initData(dailyExRates);
+        initializeTadleView();
+    }
+
+    private void initializeTadleView()
+    {
         numCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("numCode"));
         charCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, String>("charCode"));
         scaleColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("scale"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<Currency, String>("name"));
         rateColumn.setCellValueFactory(new PropertyValueFactory<Currency, Double>("rate"));
         tableUsers.setItems(userData);
+
+    }
+    @FXML
+    private void ShowListOnDate()
+    {
+        String date = ChangeFormatDate(dt_1.getValue().toString());
+        initializeListViewDate(date);
+
+        InitCurrenciesList();
+        System.out.print(listOfValueForCurrencyDate.size());
+    }
+    private void  InitCurrenciesList()
+    {
+        DailyExRates dailyExRates;
+        for(String f: userListViewDate)
+        {
+            dailyExRates = Disirealasy(f);
+            listOfValueForCurrencyDate.add(dailyExRates);
+        }
     }
 
-    private void refreshTable()
-    {
+
+    private void initializeListViewDate(String date) {
+        userListViewDate.add(date);
+        listView.setItems(userListViewDate);
+    }
+
+    private void refreshTable(){
         tableUsers.getItems().clear();
     }
 
+    public String ChangeFormatDate(String currentDate) {
 
-        public String ChangeFormatDate(String currentDate, DailyExRates dailyExRates)
-    {
         SimpleDateFormat myDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+        String newDateString  = null;
         try {
             Date date = myDateFormat.parse(currentDate);
             myDateFormat.applyPattern("MM/dd/yyyy");
-            String newDateString = myDateFormat.format(date);
-            dailyExRates.date = newDateString;
+             newDateString = myDateFormat.format(date);
+
         } catch (ParseException e) {
             System.out.println("Invalid Date Parser Exception");
         }
 
-        String date = dailyExRates.date;
-        return date;
+
+        return newDateString;
     }
 
-      public DailyExRates Disirealasy(String date) {
-          String ondate = "ondate="+ date;
+    public DailyExRates Disirealasy(String date) {
+        String ondate = "ondate=" + date;
         String xmlResult = excuteGet("http://www.nbrb.by/Services/XmlExRates.aspx", ondate);
         xmlResult = xmlResult.trim().replaceFirst("^([\\W]+)<", "<");
 
         XStream xstream = new XStream(new StaxDriver());
 
-       String dateFormat = "MM/dd/yyyy";
+        String dateFormat = "MM/dd/yyyy";
         String[] acceptableFormats = {dateFormat};
         xstream.registerConverter(new DateConverter(dateFormat, acceptableFormats));
 
@@ -113,10 +147,9 @@ public class Controller{
         return dailyExRates;
     }
 
+    private void initData(DailyExRates dailyExRates) {
 
-     private void initData(DailyExRates dailyExRates) {
-
-    for(Currency c: dailyExRates.Currencies) userData.add(c);
+        for (Currency c : dailyExRates.Currencies) userData.add(c);
 
     }
 
@@ -125,7 +158,7 @@ public class Controller{
         try {
             //Create connection
             URL url = new URL(targetURL + "?" + urlParameters);
-            connection = (HttpURLConnection)url.openConnection();
+            connection = (HttpURLConnection) url.openConnection();
             connection.setRequestMethod("GET");
             connection.setRequestProperty("Content-Type",
                     "application/x-www-form-urlencoded");
@@ -138,17 +171,17 @@ public class Controller{
             connection.setDoOutput(true);
 
             //Send request
-            DataOutputStream wr = new DataOutputStream (
+            DataOutputStream wr = new DataOutputStream(
                     connection.getOutputStream());
-                //wr.writeBytes(urlParameters);
+            //wr.writeBytes(urlParameters);
             wr.close();
 
             //Get Response
             InputStream is = connection.getInputStream();
-            BufferedReader rd = new BufferedReader(new InputStreamReader(is,"UTF-8"));
+            BufferedReader rd = new BufferedReader(new InputStreamReader(is, "UTF-8"));
             StringBuilder response = new StringBuilder(); // or StringBuffer if not Java 5+
             String line;
-            while((line = rd.readLine()) != null) {
+            while ((line = rd.readLine()) != null) {
                 response.append(line);
                 response.append('\r');
             }
@@ -158,11 +191,9 @@ public class Controller{
             e.printStackTrace();
             return null;
         } finally {
-            if(connection != null) {
+            if (connection != null) {
                 connection.disconnect();
             }
         }
     }
-
-
 }
