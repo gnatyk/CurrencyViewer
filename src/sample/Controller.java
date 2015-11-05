@@ -8,30 +8,28 @@ import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.Date;
-import java.time.LocalDate;
-import java.util.Locale;
-
 import com.thoughtworks.xstream.*;
 
+public class Controller{
 
-public class Controller {
-    //TableView<Currency> tableView = new TableView<Currency>();
+   @FXML
     private  ObservableList<Currency> userData = FXCollections.observableArrayList();
     @FXML
+    private ObservableList<String> userListViewDate = FXCollections.observableArrayList();
+    @FXML
     private DatePicker dt_1;
+    @FXML
+    private ListView <String> listView;
     @FXML
     private TableView<Currency> tableUsers;
     @FXML
@@ -50,8 +48,6 @@ public class Controller {
     private void initialize() {
 
        dt_1.setValue(LocalDate.now());
-
-
     }
 
     private static SimpleDateFormat dateFormatter = new SimpleDateFormat(
@@ -59,11 +55,14 @@ public class Controller {
 
     @FXML
     private void ShowCurrencyRate()  {
+        refreshTable();
 
         DailyExRates dailyExRates = new DailyExRates();
         String date = ChangeFormatDate(dt_1.getValue().toString(),dailyExRates);
         dailyExRates = Disirealasy(date);
-         initData(dailyExRates);
+         userListViewDate.add(date);
+        listView.setItems(userListViewDate);
+        initData(dailyExRates);
         numCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("numCode"));
         charCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, String>("charCode"));
         scaleColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("scale"));
@@ -72,7 +71,13 @@ public class Controller {
         tableUsers.setItems(userData);
     }
 
-    public String ChangeFormatDate(String currentDate, DailyExRates dailyExRates)
+    private void refreshTable()
+    {
+        tableUsers.getItems().clear();
+    }
+
+
+        public String ChangeFormatDate(String currentDate, DailyExRates dailyExRates)
     {
         SimpleDateFormat myDateFormat = new SimpleDateFormat("yyyy-MM-dd");
         try {
@@ -113,7 +118,7 @@ public class Controller {
 
     for(Currency c: dailyExRates.Currencies) userData.add(c);
 
-}
+    }
 
     public static String excuteGet(String targetURL, String urlParameters) {
         HttpURLConnection connection = null;
@@ -158,4 +163,6 @@ public class Controller {
             }
         }
     }
-   }
+
+
+}
