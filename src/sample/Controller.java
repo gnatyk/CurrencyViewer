@@ -1,14 +1,16 @@
 
 package sample;
-
 import com.thoughtworks.xstream.converters.basic.DateConverter;
 import com.thoughtworks.xstream.io.xml.StaxDriver;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.Scene;
+import javafx.scene.chart.LineChart;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.XYChart;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
 import java.io.InputStream;
@@ -19,15 +21,12 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 
 import com.thoughtworks.xstream.*;
+import javafx.stage.Stage;
 
 public class Controller {
-    @FXML
-    private Button putOntheList;
-
     @FXML
     private ObservableList<Currency> userData = FXCollections.observableArrayList();
     @FXML
@@ -71,8 +70,8 @@ public class Controller {
         initializeTadleView();
     }
 
-    private void initializeTadleView()
-    {
+
+    private void initializeTadleView() {
         numCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("numCode"));
         charCodeColumn.setCellValueFactory(new PropertyValueFactory<Currency, String>("charCode"));
         scaleColumn.setCellValueFactory(new PropertyValueFactory<Currency, Integer>("scale"));
@@ -81,49 +80,79 @@ public class Controller {
         tableUsers.setItems(userData);
 
     }
+
     @FXML
-    private void ShowListOnDate()
-    {
+    private void ShowListOnDate() {
         String date = ChangeFormatDate(dt_1.getValue().toString());
         initializeListViewDate(date);
 
         InitCurrenciesList();
         System.out.print(listOfValueForCurrencyDate.size());
     }
-    private void  InitCurrenciesList()
-    {
+
+    private void InitCurrenciesList() {
         DailyExRates dailyExRates;
-        for(String f: userListViewDate)
-        {
+        for (String f : userListViewDate) {
             dailyExRates = Disirealasy(f);
             listOfValueForCurrencyDate.add(dailyExRates);
         }
     }
+    @FXML
+    private void showChart()
+    {
+        Stage primaryStage = new Stage();
+        myChart(primaryStage);
+    }
 
+    private void myChart(Stage primaryStage)  {
+
+        NumberAxis x = new NumberAxis();
+        NumberAxis y = new NumberAxis();
+
+        LineChart<Number, Number> numberNumberLineChart = new LineChart<Number, Number>(x, y);
+        numberNumberLineChart.setTitle("Series");
+        XYChart.Series series1 = new XYChart.Series();
+        XYChart.Series series2 = new XYChart.Series();
+        series2.setName("cos(x)");
+        series1.setName("sin(x)");
+        ObservableList<XYChart.Data> datas = FXCollections.observableArrayList();
+        ObservableList<XYChart.Data> datas2 = FXCollections.observableArrayList();
+        for (int i = 0; i < 20; i++) {
+            datas.add(new XYChart.Data(i, Math.sin(i)));
+            datas2.add(new XYChart.Data(i, Math.cos(i)));
+        }
+        series1.setData(datas);
+        series2.setData(datas2);
+
+        Scene scene = new Scene(numberNumberLineChart, 600, 600);
+        numberNumberLineChart.getData().add(series1);
+        numberNumberLineChart.getData().add(series2);
+        primaryStage.setScene(scene);
+
+        primaryStage.show();
+    }
 
     private void initializeListViewDate(String date) {
         userListViewDate.add(date);
         listView.setItems(userListViewDate);
     }
 
-    private void refreshTable(){
+    private void refreshTable() {
         tableUsers.getItems().clear();
     }
 
     public String ChangeFormatDate(String currentDate) {
 
         SimpleDateFormat myDateFormat = new SimpleDateFormat("yyyy-MM-dd");
-        String newDateString  = null;
+        String newDateString = null;
         try {
             Date date = myDateFormat.parse(currentDate);
             myDateFormat.applyPattern("MM/dd/yyyy");
-             newDateString = myDateFormat.format(date);
+            newDateString = myDateFormat.format(date);
 
         } catch (ParseException e) {
             System.out.println("Invalid Date Parser Exception");
         }
-
-
         return newDateString;
     }
 
@@ -173,8 +202,7 @@ public class Controller {
             //Send request
             DataOutputStream wr = new DataOutputStream(
                     connection.getOutputStream());
-            //wr.writeBytes(urlParameters);
-            wr.close();
+                     wr.close();
 
             //Get Response
             InputStream is = connection.getInputStream();

@@ -22,7 +22,8 @@
             <TableColumn fx:id="rateColumn" prefWidth="81.0" text="Rate" />
         </columns>
       </TableView>
-      <ListView fx:id="listView" layoutX="53.0" layoutY="337.0" prefHeight="200.0" prefWidth="200.0" />
+      <ListView fx:id="listView" layoutX="53.0" layoutY="121.0" prefHeight="200.0" prefWidth="200.0" />
       <Button fx:id="putOntheList" layoutX="161.0" layoutY="60.0" mnemonicParsing="false" onAction="#ShowListOnDate" text="Put on the list" />
+      <Button layoutX="54.0" layoutY="350.0" mnemonicParsing="false" onAction="#showChart" text="Button" />
    </children>
 </Pane>
